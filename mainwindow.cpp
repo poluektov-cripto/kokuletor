@@ -23,8 +23,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->MinusButton, &QPushButton::clicked,this,&MainWindow::add_to_opr);
     connect(ui->DivideButton, &QPushButton::clicked,this,&MainWindow::add_to_opr);
     connect(ui->MultiplyButton, &QPushButton::clicked,this,&MainWindow::add_to_opr);
-    connect(ui->ClearButton, &QPushButton::clicked,this,&MainWindow::add_to_opr);
-    connect(ui->equalButton, &QPushButton::clicked,this,&MainWindow::add_to_opr);
+    connect(ui->ClearButton, &QPushButton::clicked,this,&MainWindow::def_date_clear);
+    connect(ui->equalButton, &QPushButton::clicked,this,&MainWindow::equal_def);
 }
 
 
@@ -44,33 +44,43 @@ void MainWindow::Display_out(){
 
 // объявление функций
 
+void MainWindow::on_DeletepushButton_clicked()
+{
+    if(tempstr.size() !=0){
+        tempstr.resize(tempstr.length() -1);
+    }
+    else if(oprs.size() !=0){
+        oprs.clear();
+    }
+    else if ( Inputstr.size()!= 0 ){
+        Inputstr.resize(Inputstr.length() -1);
+    }
+
+    if (oprs.size() !=0){
+    Display = Inputstr + ' ' + oprs[0].Get_tipe() + ' ' + tempstr;
+    }
+    else
+        Display = Inputstr + ' ' + tempstr;
+    Display_out();
+}
+
 void MainWindow::date_clear(){
     tempstr.clear();
     Inputstr.clear();
     oprs.clear();
 }
 
-bool MainWindow::def_date_clear(QString res){
+void MainWindow::equal_def(){
+    add_to_history();
+    MainFunction(true);
+}
 
-        if (oprs[0].Get_tipe() == "C"){
-            date_clear();
-            Display = "";
-            return false;
-        }
-
-        if (oprs[0].Get_tipe() == "="){
-            Display='=' + res;
-            add_to_history(res);
-            return false;
-        }
-
-        if (oprs[0].Get_tipe() == "CE"){
-            Display="";
-            date_clear();
-            ui->Historywindow->clear();
-            return false;
-            }
-    return true;
+void MainWindow::def_date_clear(){
+    tempstr.clear();
+    Inputstr.clear();
+    oprs.clear();
+    Display.clear();
+    Display_out();
 }
 
 
@@ -99,13 +109,14 @@ QString Since::function(QString v1,QString v2){
             result=(v1.toDouble() / v2.toDouble());}
         return QString::number(result,'f',8);
 }
+
 bool MainWindow::Possible_result(){
     return oprs.size() !=0 and Inputstr.size() != 0 and tempstr.size() != 0;
 }
 
 // добавление в переменные
 
-void MainWindow::add_to_history(QString res){
+void MainWindow::add_to_history(){
     QString temp;
     temp= Inputstr + ' ' + oprs[0].Get_tipe() + ' ' + tempstr + " = " + res;
     ui->Historywindow->addItem(temp);
@@ -134,23 +145,42 @@ void MainWindow::add_to_str(){
 
 // главная функция
 
-void MainWindow::MainFunction(){
-    QString res;
+void MainWindow::MainFunction(bool ecval_flag){
+
+    if(ecval_flag){
+        Display = '=' + res;
+        tempstr.clear();
+        Inputstr.clear();
+        oprs.clear();
+    }
+
+    if (oprs.size() > 0)
+        Display = Inputstr + ' ' + oprs[0].Get_tipe() + ' ' + tempstr;
+    else
+        Display = tempstr;
+
 
     if(MainWindow::Possible_result()){
 
     res = oprs[0].function(Inputstr,tempstr);
+
     Display = Inputstr + ' ' + oprs[0].Get_tipe() + ' ' + tempstr + '\n' + '=' + ' ' + res;
+
+
     }
-        if (def_date_clear(res))
-        {
-            if (oprs.size() > 0)
-                Display = Inputstr + ' ' + oprs[0].Get_tipe() + ' ' + tempstr;
-            else
-                Display = tempstr;
-        }
+
 
 
     MainWindow::Display_out();
+}
+
+
+
+
+
+void MainWindow::on_ClearallButton_clicked()
+{
+    ui->Historywindow->clear();
+    def_date_clear();
 }
 

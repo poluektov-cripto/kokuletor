@@ -40,18 +40,25 @@ public:
     ~MainWindow();
 
 
+private slots:
+    void on_DeletepushButton_clicked();
+
+    void on_ClearallButton_clicked();
+
 private:
     Ui::MainWindow *ui;
+    QString res;
     QString tempstr;
     QString Inputstr;
     QString Display;
     QVector <Since> oprs;
-    bool def_date_clear(QString res);
-    void add_to_history(QString res);
+    void def_date_clear();
+    void equal_def();
+    void add_to_history();
     void add_to_str();
     void add_to_opr();
     bool Possible_result();
     void Display_out();
-    void MainFunction();
+    void MainFunction(bool ecval_flag = false);
 };
 #endif // MAINWINDOW_H
